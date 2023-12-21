@@ -10,14 +10,6 @@ load_dotenv()
 
 def get_database_engine():
     while True:
-        username = os.getenv('USER')
-        password = os.getenv('PASSWORD')
-        host = os.getenv('HOST')
-        port = os.getenv('PORT_DB')
-        dbname = os.getenv('DBNAME')
-        engine = sqlalchemy.create_engine(
-            "mysql+pymysql://" + username + ":" + password + "@" + host + ":" + port + "/" + dbname)
-
         try:
             # for local test
             username = os.getenv('DB_USER')
