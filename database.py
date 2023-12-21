@@ -10,6 +10,14 @@ load_dotenv()
 
 def get_database_engine():
     while True:
+        username = os.getenv('USER')
+        password = os.getenv('PASSWORD')
+        host = os.getenv('HOST')
+        port = os.getenv('PORT_DB')
+        dbname = os.getenv('DBNAME')
+        engine = sqlalchemy.create_engine(
+            "mysql+pymysql://" + username + ":" + password + "@" + host + ":" + port + "/" + dbname)
+
         try:
             # for local test
             username = os.getenv('DB_USER')
@@ -178,91 +186,3 @@ def get_history_user_and_jenis_sampah(username, jenis_sampah):
     ]
 
     return history_list
-
-# def filter_result(table_str, matrixColumn, matrixData):
-#     # bisa mengambil data pada table dengan hanya sebuah string
-#
-#     # table_class = globals().get(table_str.title())
-#     # if not table_class:
-#     #     raise ValueError(f"Table class '{table_str}' not found.")
-#
-#     result = session.query(cls[table_str])
-#     for i in range(len(matrixColumn)):
-#         if matrixColumn[i] == "jenis":  # SOLUSI SEMENTARA UNTUK KOLOM DENGAN NAMA NYA LEBIH DARI SATU KATA
-#             matrixColumn[i] = "jenis_perangkat"
-#         # new_result = result.filter(getattr(cls[table_str], matrixColumn[i]) == matrixData[i])
-#         new_result = result.filter(getattr(cls[table_str], matrixColumn[i]).like('%' + matrixData[i] + '%'))
-#         result = new_result
-#     return result
-#
-#
-# def getTableColumns(table_name):
-#     table = inspect(engine).get_columns(table_name)
-#     column_names = [column['name'] for column in table]
-#     return column_names
-#
-#
-# def get_table_privilege():
-#     tables = session.query(cls['table_lists']).all()
-#     result = {}
-#     for table in tables:
-#         result[table.table_name] = table.privilege  # ini masih kurang dynamic,, misal nama kolomnya berubah
-#     return result
-#
-#
-# def add_contact(lokasi, pic, kontak):
-#     new_contact = cls['contacts'](lokasi=lokasi, pic=pic, kontak=kontak)
-#     session.add(new_contact)
-#     session.commit()
-#     # return [lokasi, pic, kontak]
-#
-#
-# def addUser(nama, role, telegramid):
-#     newUser = cls['users'](nama_telegram=nama, role=role, telegram_id=telegramid)
-#     session.add(newUser)
-#     session.commit()
-#     return [nama, role]
-#
-#
-# def select_all_users():
-#     employees = session.query(cls['users']).all()
-#     for employee in employees:
-#         employeename = " - " + employee.nama_telegram + ' ' + employee.role
-#         print(employeename)
-#
-#
-# def selectByRole(telegramid):
-#     users = session.query(cls['users']).filter_by(telegram_id=telegramid)
-#     return users
-#
-#
-# def updateUserStatus(id, isActive):
-#     employee = session.get(cls['users'], id)
-#     employee.active = isActive
-#     session.commit()
-#
-#
-# def deleteUser(id):
-#     session.query(cls['users']).filter(cls['users'].id == id).delete()
-#     session.commit()
-#
-#
-# def summary_table(table, column, select_value, summary_columns):
-#     summary_dictionary = {}
-#     for summary_column in summary_columns:
-#         query = f"""
-#                 SELECT {column}, {summary_column}, COUNT(*)
-#                 FROM  {table}
-#                 WHERE {column} = :{column}
-#                 GROUP BY {summary_column}
-#                 """
-#         with engine.connect() as connection:
-#             results = connection.execute(text(query), {column: select_value}).fetchall()
-#
-#         column_name = {}
-#         for value in results:
-#             column_name[value[1]] = value[2]
-#
-#         summary_dictionary[summary_column] = column_name
-#
-#     return summary_dictionary
