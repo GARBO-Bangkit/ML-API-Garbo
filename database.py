@@ -10,27 +10,27 @@ load_dotenv()
 
 def get_database_engine():
     while True:
-        # for local test
-        # username = os.getenv('USER')
-        # password = os.getenv('PASSWORD')
-        # host = os.getenv('HOST')
-        # port = os.getenv('PORT_DB')
-        # dbname = os.getenv('DBNAME')
-        # engine = sqlalchemy.create_engine(
-        #     "mysql+pymysql://" + username + ":" + password + "@" + host + ":" + port + "/" + dbname)
         try:
-            db_user = os.environ.get("DB_USER")
-            db_pass = os.environ.get("DB_PASS")
-            db_name = os.environ.get("DB_NAME")
-            cloud_sql_connection_name = os.environ.get("CLOUD_SQL_CONNECTION_NAME")
-
-            # When deployed to Cloud Run, the `DB_SOCKET_PATH` will be provided by the environment.
-            db_socket_path = os.environ.get("DB_SOCKET_PATH", "/cloudsql")
-
-            # Configure SQLAlchemy engine
-            engine = create_engine(
-                f"mysql+pymysql://{db_user}:{db_pass}@/{db_name}?unix_socket={db_socket_path}/{cloud_sql_connection_name}"
-            )
+            # for local test
+            username = os.getenv('DB_USER')
+            password = os.getenv('DB_PASS')
+            host = os.getenv('HOST')
+            port = os.getenv('PORT_DB')
+            dbname = os.getenv('DB_NAME')
+            engine = sqlalchemy.create_engine(
+                "mysql+pymysql://" + username + ":" + password + "@" + host + ":" + port + "/" + dbname)
+            # db_user = os.environ.get("DB_USER")
+            # db_pass = os.environ.get("DB_PASS")
+            # db_name = os.environ.get("DB_NAME")
+            # cloud_sql_connection_name = os.environ.get("CLOUD_SQL_CONNECTION_NAME")
+            #
+            # # When deployed to Cloud Run, the `DB_SOCKET_PATH` will be provided by the environment.
+            # db_socket_path = os.environ.get("DB_SOCKET_PATH", "/cloudsql")
+            #
+            # # Configure SQLAlchemy engine
+            # engine = create_engine(
+            #     f"mysql+pymysql://{db_user}:{db_pass}@/{db_name}?unix_socket={db_socket_path}/{cloud_sql_connection_name}"
+            # )
             print("Connection to the database successful!")
             print(engine)
             return engine
