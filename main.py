@@ -1,18 +1,16 @@
 import io
-import os
+import numpy as np
+
+from database import *
+from functions import *
 
 from tensorflow import keras
-import numpy as np
-from database import *
 from PIL import Image
 from flask import Flask, request, jsonify
-from flask_jwt_extended import create_access_token
-from flask_jwt_extended import jwt_required, JWTManager, get_jwt_identity
+from flask_jwt_extended import create_access_token, jwt_required, JWTManager, get_jwt_identity
 from datetime import timedelta
 from google.cloud import storage
 from werkzeug.utils import secure_filename
-from functions import *
-import uuid
 
 load_dotenv()
 
