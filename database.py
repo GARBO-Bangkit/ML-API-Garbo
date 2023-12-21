@@ -71,14 +71,6 @@ def connect_with_connector() -> sqlalchemy.engine.base.Engine:
 engine = connect_with_connector()
 Base = declarative_base()
 
-
-def get_table_names(engine=engine):
-    table_names = inspect(engine).get_table_names()
-    return table_names
-
-
-print(get_table_names())
-
 Session = sqlalchemy.orm.sessionmaker()
 Session.configure(bind=engine)
 session = Session()
@@ -112,7 +104,7 @@ class History(Base):
     user = relationship("User", back_populates="histories")
 
 
-Base.metadata.create_all(engine)
+# Base.metadata.create_all(engine)
 
 
 # users = session.query(User).all()
