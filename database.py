@@ -9,36 +9,6 @@ import pymysql
 
 load_dotenv()
 
-# def get_database_engine():
-#     while True:
-#         try:
-#             # for local test
-#             username = os.getenv('DB_USER')
-#             password = os.getenv('DB_PASS')
-#             host = os.getenv('HOST')
-#             port = os.getenv('PORT_DB')
-#             dbname = os.getenv('DB_NAME')
-#             engine = sqlalchemy.create_engine(
-#                 "mysql+pymysql://" + username + ":" + password + "@" + host + ":" + port + "/" + dbname)
-#             # db_user = os.environ.get("DB_USER")
-#             # db_pass = os.environ.get("DB_PASS")
-#             # db_name = os.environ.get("DB_NAME")
-#             # cloud_sql_connection_name = os.environ.get("CLOUD_SQL_CONNECTION_NAME")
-#             #
-#             # # When deployed to Cloud Run, the `DB_SOCKET_PATH` will be provided by the environment.
-#             # db_socket_path = os.environ.get("DB_SOCKET_PATH", "/cloudsql")
-#             #
-#             # # Configure SQLAlchemy engine
-#             # engine = create_engine(
-#             #     f"mysql+pymysql://{db_user}:{db_pass}@/{db_name}?unix_socket={db_socket_path}/{cloud_sql_connection_name}"
-#             # )
-#             print("Connection to the database successful!")
-#             print(engine)
-#             return engine
-#         except Exception as e:
-#             print("Error connecting to the database:", e)
-#             print("Please try again.\n")
-
 def connect_with_connector() -> sqlalchemy.engine.base.Engine:
 
     instance_connection_name = os.environ[
@@ -102,18 +72,6 @@ class History(Base):
     jenis_sampah = Column(String(100))
 
     user = relationship("User", back_populates="histories")
-
-
-# Base.metadata.create_all(engine)
-
-
-# users = session.query(User).all()
-# for user in users:
-#     print(user.point)
-#
-# histories = session.query(History).all()
-# for history in histories:
-#     print(history.username)
 
 # select table query
 def select_all(table):
