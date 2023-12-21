@@ -61,7 +61,9 @@ def login():
 
     if login_user(data):
         access_token = create_access_token(identity=data['username'])
-        return jsonify(access_token=access_token), 200
+        profile = get_point(data['username'])
+        profile['access_token'] = access_token
+        return jsonify(profile), 200
     else:
         return jsonify({"message": "Invalid username or password"}), 401
 
