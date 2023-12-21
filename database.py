@@ -4,42 +4,71 @@ from sqlalchemy import inspect, Column, Integer, String, ForeignKey, create_engi
 from sqlalchemy.orm import declarative_base, relationship
 import bcrypt
 from datetime import datetime
+from google.cloud.sql.connector import Connector, IPTypes
+import pymysql
 
 load_dotenv()
 
+# def get_database_engine():
+#     while True:
+#         try:
+#             # for local test
+#             username = os.getenv('DB_USER')
+#             password = os.getenv('DB_PASS')
+#             host = os.getenv('HOST')
+#             port = os.getenv('PORT_DB')
+#             dbname = os.getenv('DB_NAME')
+#             engine = sqlalchemy.create_engine(
+#                 "mysql+pymysql://" + username + ":" + password + "@" + host + ":" + port + "/" + dbname)
+#             # db_user = os.environ.get("DB_USER")
+#             # db_pass = os.environ.get("DB_PASS")
+#             # db_name = os.environ.get("DB_NAME")
+#             # cloud_sql_connection_name = os.environ.get("CLOUD_SQL_CONNECTION_NAME")
+#             #
+#             # # When deployed to Cloud Run, the `DB_SOCKET_PATH` will be provided by the environment.
+#             # db_socket_path = os.environ.get("DB_SOCKET_PATH", "/cloudsql")
+#             #
+#             # # Configure SQLAlchemy engine
+#             # engine = create_engine(
+#             #     f"mysql+pymysql://{db_user}:{db_pass}@/{db_name}?unix_socket={db_socket_path}/{cloud_sql_connection_name}"
+#             # )
+#             print("Connection to the database successful!")
+#             print(engine)
+#             return engine
+#         except Exception as e:
+#             print("Error connecting to the database:", e)
+#             print("Please try again.\n")
 
-def get_database_engine():
-    while True:
-        try:
-            # for local test
-            username = os.getenv('DB_USER')
-            password = os.getenv('DB_PASS')
-            host = os.getenv('HOST')
-            port = os.getenv('PORT_DB')
-            dbname = os.getenv('DB_NAME')
-            engine = sqlalchemy.create_engine(
-                "mysql+pymysql://" + username + ":" + password + "@" + host + ":" + port + "/" + dbname)
-            # db_user = os.environ.get("DB_USER")
-            # db_pass = os.environ.get("DB_PASS")
-            # db_name = os.environ.get("DB_NAME")
-            # cloud_sql_connection_name = os.environ.get("CLOUD_SQL_CONNECTION_NAME")
-            #
-            # # When deployed to Cloud Run, the `DB_SOCKET_PATH` will be provided by the environment.
-            # db_socket_path = os.environ.get("DB_SOCKET_PATH", "/cloudsql")
-            #
-            # # Configure SQLAlchemy engine
-            # engine = create_engine(
-            #     f"mysql+pymysql://{db_user}:{db_pass}@/{db_name}?unix_socket={db_socket_path}/{cloud_sql_connection_name}"
-            # )
-            print("Connection to the database successful!")
-            print(engine)
-            return engine
-        except Exception as e:
-            print("Error connecting to the database:", e)
-            print("Please try again.\n")
+def connect_with_connector() -> sqlalchemy.engine.base.Engine:
 
+    instance_connection_name = os.environ[
+        "INSTANCE_CONNECTION_NAME"
+    ]  # e.g. 'project:region:instance'
+    db_user = os.environ["DB_USER"]  # e.g. 'my-db-user'
+    db_pass = os.environ["DB_PASS"]  # e.g. 'my-db-password'
+    db_name = os.environ["DB_NAME"]  # e.g. 'my-database'
 
-engine = get_database_engine()
+    ip_type = IPTypes.PRIVATE if os.environ.get("PRIVATE_IP") else IPTypes.PUBLIC
+
+    connector = Connector(ip_type)
+
+    def getconn() -> pymysql.connections.Connection:
+        conn: pymysql.connections.Connection = connector.connect(
+            instance_connection_name,
+            "pymysql",
+            user=db_user,
+            password=db_pass,
+            db=db_name,
+        )
+        return conn
+
+    pool = sqlalchemy.create_engine(
+        "mysql+pymysql://",
+        creator=getconn,
+    )
+    return pool
+
+engine = connect_with_connector()
 Base = declarative_base()
 
 
