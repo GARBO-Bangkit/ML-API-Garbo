@@ -13,7 +13,7 @@ def get_database_engine():
         username = os.getenv('USER')
         password = os.getenv('PASSWORD')
         host = os.getenv('HOST')
-        port = os.getenv('PORT')
+        port = os.getenv('PORT_DB')
         dbname = os.getenv('DBNAME')
         engine = sqlalchemy.create_engine(
             "mysql+pymysql://" + username + ":" + password + "@" + host + ":" + port + "/" + dbname)
