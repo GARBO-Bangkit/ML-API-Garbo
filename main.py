@@ -131,6 +131,16 @@ def gethistory():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/point', methods=['GET'])
+@jwt_required()
+def getpoint():
+    try:
+        current_user = get_jwt_identity()
+        point = get_point(current_user)
+        return jsonify(point)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @app.route('/result/<jenis_sampah>', methods=['GET'])
 @jwt_required()
 def get_filtered_history(jenis_sampah):
@@ -156,4 +166,3 @@ def internal_error(error):
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
- 

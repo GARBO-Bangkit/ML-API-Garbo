@@ -13,10 +13,10 @@ def connect_with_connector() -> sqlalchemy.engine.base.Engine:
 
     instance_connection_name = os.environ[
         "INSTANCE_CONNECTION_NAME"
-    ]  # e.g. 'project:region:instance'
-    db_user = os.environ["DB_USER"]  # e.g. 'my-db-user'
-    db_pass = os.environ["DB_PASS"]  # e.g. 'my-db-password'
-    db_name = os.environ["DB_NAME"]  # e.g. 'my-database'
+    ]
+    db_user = os.environ["DB_USER"]
+    db_pass = os.environ["DB_PASS"]
+    db_name = os.environ["DB_NAME"]
 
     ip_type = IPTypes.PRIVATE if os.environ.get("PRIVATE_IP") else IPTypes.PUBLIC
 
@@ -138,6 +138,18 @@ def get_history_user(username):
             "jenis_sampah": record.jenis_sampah
         } for record in history_records
     ]
+
+    return history_list
+
+def get_point(username):
+    record = session.query(User).filter_by(username=username).first()
+
+    history_list = {
+            "username": record.username,
+            "name": record.name,
+            "email": record.email,
+            "point": record.point
+            }
 
     return history_list
 
