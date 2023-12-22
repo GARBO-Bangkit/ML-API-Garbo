@@ -153,6 +153,19 @@ def get_filtered_history(jenis_sampah):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/lasthistory', methods=['GET'])
+@jwt_required()
+def getlasthistory():
+    try:
+        current_user = get_jwt_identity()
+        last_history = get_latest_history_by_username(current_user)
+        if last_history is None:
+            return jsonify({'message': 'Missing data. Data belum di input'}), 400
+        else:
+            return jsonify(last_history)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 #error handling
 @app.errorhandler(404)
 def not_found_error(error):

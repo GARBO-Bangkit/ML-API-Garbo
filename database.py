@@ -169,3 +169,20 @@ def get_history_user_and_jenis_sampah(username, jenis_sampah):
     ]
 
     return history_list
+
+def get_latest_history_by_username(username):
+    latest_history = session.query(History).filter(
+        History.username == username
+    ).order_by(
+        History.timestamp.desc()
+    ).first()
+
+    if latest_history:
+        return {
+            "username": latest_history.username,
+            "foto": latest_history.foto,
+            "timestamp": latest_history.timestamp,
+            "jenis_sampah": latest_history.jenis_sampah
+        }
+    else:
+        return None
