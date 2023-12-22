@@ -9,8 +9,8 @@ import pymysql
 
 load_dotenv()
 
-def connect_with_connector() -> sqlalchemy.engine.base.Engine:
 
+def connect_with_connector() -> sqlalchemy.engine.base.Engine:
     instance_connection_name = os.environ[
         "INSTANCE_CONNECTION_NAME"
     ]
@@ -37,6 +37,7 @@ def connect_with_connector() -> sqlalchemy.engine.base.Engine:
         creator=getconn,
     )
     return pool
+
 
 engine = connect_with_connector()
 Base = declarative_base()
@@ -72,6 +73,7 @@ class History(Base):
     jenis_sampah = Column(String(100))
 
     user = relationship("User", back_populates="histories")
+
 
 # select table query
 def select_all(table):
@@ -127,31 +129,37 @@ def add_history(username, foto, jenis_sampah):
     session.add(new_data)
     session.commit()
 
+
 def get_history_user(username):
     history_records = session.query(History).filter_by(username=username).all()
 
-    history_list = [
-        {
-            "username": record.username,
-            "foto": record.foto,
-            "timestamp": record.timestamp,
-            "jenis_sampah": record.jenis_sampah
-        } for record in history_records
-    ]
+    if history_records:
+        history_list = [
+            {
+                "username": record.username,
+                "foto": record.foto,
+                "timestamp": record.timestamp,
+                "jenis_sampah": record.jenis_sampah
+            } for record in history_records
+        ]
 
-    return history_list
+        return history_list
+    else:
+        return None
+
 
 def get_point(username):
     record = session.query(User).filter_by(username=username).first()
 
     history_list = {
-            "username": record.username,
-            "name": record.name,
-            "email": record.email,
-            "point": record.point
-            }
+        "username": record.username,
+        "name": record.name,
+        "email": record.email,
+        "point": record.point
+    }
 
     return history_list
+
 
 def get_history_user_and_jenis_sampah(username, jenis_sampah):
     history_records = session.query(History).filter(
@@ -159,16 +167,20 @@ def get_history_user_and_jenis_sampah(username, jenis_sampah):
         History.jenis_sampah == jenis_sampah
     ).all()
 
-    history_list = [
-        {
-            "username": record.username,
-            "foto": record.foto,
-            "timestamp": record.timestamp,
-            "jenis_sampah": record.jenis_sampah
-        } for record in history_records
-    ]
+    if history_records:
+        history_list = [
+            {
+                "username": record.username,
+                "foto": record.foto,
+                "timestamp": record.timestamp,
+                "jenis_sampah": record.jenis_sampah
+            } for record in history_records
+        ]
 
-    return history_list
+        return history_list
+    else:
+        return None
+
 
 def get_latest_history_by_username(username):
     latest_history = session.query(History).filter(

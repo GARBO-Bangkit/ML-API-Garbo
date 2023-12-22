@@ -22,23 +22,26 @@ app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
 
 jwt = JWTManager(app)
 
-#inlitialize google cloud storage bucket
+# inlitialize google cloud storage bucket
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "key/garbage-classification-408613-0f1ae06ae751.json"
 
 client = storage.Client()
 bucket_name = os.getenv('BUCKET_NAME')
 
-#inlitialize model
+# inlitialize model
 model = keras.models.load_model("model.h5")
 class_names = ['cardboard', 'glass', 'metal', 'paper', 'plastic']
+
 
 @jwt.expired_token_loader
 def expired_token_callback(jwt_header, jwt_payload):
     return jsonify({"error": "Token has expired"}), 401
 
+
 @app.route('/', methods=['GET'])
 def home():
     return "API is running!"
+
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -53,6 +56,7 @@ def register():
 
     return jsonify({'message': 'User registered successfully'}), 201
 
+
 @app.route('/login', methods=['POST'])
 def login():
     data = request.json
@@ -66,6 +70,7 @@ def login():
         return jsonify(profile), 200
     else:
         return jsonify({"message": "Invalid username or password"}), 401
+
 
 @app.route('/sendpicture', methods=['POST'])
 @jwt_required()
@@ -123,23 +128,17 @@ def sendpicture():
     except Exception as e:
         return jsonify({"error": str(e)})
 
+
 @app.route('/result', methods=['GET'])
 @jwt_required()
 def gethistory():
     try:
         current_user = get_jwt_identity()
         history_list = get_history_user(current_user)
-        return jsonify(history_list)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-@app.route('/point', methods=['GET'])
-@jwt_required()
-def getpoint():
-    try:
-        current_user = get_jwt_identity()
-        point = get_point(current_user)
-        return jsonify(point)
+        if history_list is None:
+            return jsonify({'message': 'Missing data. Data belum di input'}), 400
+        else:
+            return jsonify({"result_list": history_list})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -149,9 +148,13 @@ def get_filtered_history(jenis_sampah):
     try:
         current_user = get_jwt_identity()
         history_list = get_history_user_and_jenis_sampah(current_user, jenis_sampah)
-        return jsonify(history_list)
+        if history_list is None:
+            return jsonify({'message': 'Missing data. Data kategori tersebut belum di input'}), 400
+        else:
+            return jsonify({"result_list": history_list})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 @app.route('/lasthistory', methods=['GET'])
 @jwt_required()
@@ -166,18 +169,31 @@ def getlasthistory():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-#error handling
+@app.route('/point', methods=['GET'])
+@jwt_required()
+def getpoint():
+    try:
+        current_user = get_jwt_identity()
+        point = get_point(current_user)
+        return jsonify(point)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# error handling
 @app.errorhandler(404)
 def not_found_error(error):
     return jsonify({"error": "Resource not found"}), 404
+
 
 @app.errorhandler(400)
 def bad_request_error(error):
     return jsonify({"error": "Bad request"}), 400
 
+
 @app.errorhandler(500)
 def internal_error(error):
     return jsonify({"error": "Internal server error"}), 500
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
